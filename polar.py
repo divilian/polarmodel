@@ -51,6 +51,12 @@ class CitizenAgent(Agent):
         return "Agent {}".format(self.unique_id)
 
 
+def mean_opinion_var(model):
+    return np.array(
+        [ np.array([ c.opinions[i] for c in model.schedule.agents ])
+            for i in range(model.num_issues)
+        ]).var()
+
 
 class SocialWorld(Model):
 
@@ -90,11 +96,10 @@ class SocialWorld(Model):
             self.schedule.add(c)
         self.running = True   # could set this to stop prematurely
 
-#        self.datacollector = DataCollector(
-#            agent_reporters={},
-#            model_reporters={
-#                "FracRed": lambda model:
-#                    frac_with_opinion(model.schedule.agents, Opinion.RED) })
+        self.datacollector = DataCollector(
+            agent_reporters={},
+            model_reporters={
+                "MeanOpinionVar": mean_opinion_var })
 
     def step(self):
         if not self.running:
@@ -105,7 +110,7 @@ class SocialWorld(Model):
             self.running = False
         self.num_steps += 1
         logging.debug("Iteration {}...".format(self.num_steps))
-#        self.datacollector.collect(self)
+        self.datacollector.collect(self)
         self.schedule.step()
 
 
@@ -113,6 +118,19 @@ class SocialWorld(Model):
         for _ in range(self.max_steps):
             self.step()
 
+
+def make_plots(model):
+
+    df = model.datacollector.get_model_vars_dataframe()
+
+    plt.clf()
+    plt.plot(df['MeanOpinionVar'],
+        color='green',linewidth=2)
+    plt.ylim((0,df['MeanOpinionVar'].max()*1.1))
+    plt.xlabel('Iteration')
+    plt.ylabel(r'$\mu_{opinion(\sigma^2)}$',fontsize=16)
+    plt.title("Mean opinion variance over time")
+    plt.savefig('meanOpinionVar.png')
 
 
 if __name__ == "__main__":
@@ -124,8 +142,9 @@ if __name__ == "__main__":
     if sys.argv[1] == "single":
 
         # Single simulation run.
-        m = SocialWorld(500, 40, 10, 0, .2)
+        m = SocialWorld(400, 40, 10, 0.05, .2)
         m.run()
+        make_plots(m)
 
     else:
 
