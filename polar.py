@@ -22,7 +22,7 @@ class CitizenAgent(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         logging.info("Instantiating citizen {}.".format(self.unique_id))
-        self.opinions = np.random.uniform(0,1,size=model.num_issues)
+        self.opinions = model.random.uniform(0,1,size=model.num_issues)
 
     def step(self):
         logging.info("Running citizen {}...".format(self.unique_id))
@@ -30,8 +30,8 @@ class CitizenAgent(Agent):
         if len(neis) == 0:
             logging.info("  Agent {} has no neighbors!".format(self.unique_id))
         else:
-            nei = self.model.schedule.agents[np.random.choice(neis)]
-            compare, persuade = np.random.choice(
+            nei = self.model.schedule.agents[self.model.random.choice(neis)]
+            compare, persuade = self.model.random.choice(
                 np.arange(0,len(self.opinions)), size=2, replace=False)
             if (np.abs(self.opinions[compare] - nei.opinions[compare]) 
                     > self.model.Cthresh):
@@ -60,8 +60,13 @@ class SocialWorld(Model):
     ER_p - probability of edge for ER model
     """
     def __init__(self, T, N, I, Cthresh, ER_p):
+
         logging.info("Initializing SocialWorld({},{},{},{},{})...".format(
             T,N,I,Cthresh,ER_p))
+
+        # https://github.com/projectmesa/mesa/issues/958#issuecomment-733651008
+        self.random = np.random.default_rng(123)
+        
         self.max_steps = T
         self.num_agents = N
         self.num_issues = I
