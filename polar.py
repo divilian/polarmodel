@@ -40,6 +40,8 @@ class CitizenAgent(Agent):
             else:
                 logging.info("  Agent {} listens to {}...".format(
                     self.unique_id, nei.unique_id))
+                self.opinions[persuade] = \
+                    (self.opinions[persuade] + nei.opinions[persuade]) / 2
         
 
     def __str__(self):
