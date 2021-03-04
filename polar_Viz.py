@@ -19,8 +19,8 @@ if __name__ == "__main__":
 
     issueplots = [ ChartModule(
         [{"Label":"agent"+str(a)+"_iss"+str(i),"Color":colors[a]}
-            for a in range(4) for i in range(3)],
-        data_collector_name="datacollector") ]
+            for a in range(4) ], data_collector_name="datacollector") 
+            for i in range(3) ]
 
     server = ModularServer(SocialWorld, issueplots,
         "Polarizers",
