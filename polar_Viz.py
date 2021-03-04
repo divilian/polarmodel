@@ -17,11 +17,12 @@ if __name__ == "__main__":
     Cthresh = UserSettableParameter("slider","Comparison threshold",.5,0,1,.05)
     p = UserSettableParameter("slider","ER edge probability (p)",.2,0.05,1,.05)
 
-    issue1plot = ChartModule(
-        [{"Label":"agent"+str(i),"Color":colors[i]} for i in range(4)],
-        data_collector_name="datacollector")
+    issueplots = [ ChartModule(
+        [{"Label":"agent"+str(a)+"_iss"+str(i),"Color":colors[a]}
+            for a in range(4) for i in range(3)],
+        data_collector_name="datacollector") ]
 
-    server = ModularServer(SocialWorld, [issue1plot],
+    server = ModularServer(SocialWorld, issueplots,
         "Polarizers",
         { "N":N, "T":T, "I":I, "Cthresh": Cthresh, "ER_p":p })
         

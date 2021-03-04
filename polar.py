@@ -104,8 +104,9 @@ class SocialWorld(Model):
         self.datacollector = DataCollector(
             agent_reporters={},
             model_reporters={
-                "agent"+str(i):
-                    lambda model, n=i: get_opinion(model,n,0) for i in range(4)
+                "agent"+str(a)+"_iss"+str(i):
+                    lambda model, n=a, m=i: get_opinion(model,n,m)
+                        for a in range(4) for i in range(3) 
             })
 
     def step(self):
