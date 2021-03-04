@@ -14,7 +14,7 @@ import subprocess
 import sys
 import glob
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 
 class CitizenAgent(Agent):
@@ -49,6 +49,11 @@ class CitizenAgent(Agent):
 
     def __repr__(self):
         return "Agent {}".format(self.unique_id)
+
+
+def get_opinion(model, agent_num, issue_num):
+    print("get_opinion({}) for agent {}".format(issue_num, agent_num))
+    return model.schedule.agents[agent_num].opinions[issue_num]
 
 
 def mean_opinion_var(model):
@@ -99,7 +104,9 @@ class SocialWorld(Model):
         self.datacollector = DataCollector(
             agent_reporters={},
             model_reporters={
-                "MeanOpinionVar": mean_opinion_var })
+                "agent"+str(i):
+                    lambda model, n=i: get_opinion(model,n,0) for i in range(4)
+            })
 
     def step(self):
         if not self.running:
